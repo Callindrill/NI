@@ -11,7 +11,8 @@ namespace CryptoDemo
         {
             // SymmetricDemo();
             // AsymmetricDemo();
-            HashDemo();
+            // HashDemo();
+            HMACDemo();
 
             Console.ReadKey();
         }
@@ -54,6 +55,24 @@ namespace CryptoDemo
 
                 Console.WriteLine(Convert.ToBase64String(digest));
             }
+        }
+
+        static void HMACDemo()
+        {
+            Console.Write("Input: ");
+            string input = Console.ReadLine();
+
+            byte[] key = new byte[32];
+
+            using (var rng = new RNGCryptoServiceProvider()) {
+                rng.GetBytes(key);
+            }
+
+            string hmac = HmacGen.Gen(input, key);
+            Console.WriteLine($"HMAC: {hmac}");
+
+            bool isValid = HmacGen.Verify(input, hmac, key);
+            Console.WriteLine($"IsValid: {isValid.ToString()}");
         }
     }
 }
