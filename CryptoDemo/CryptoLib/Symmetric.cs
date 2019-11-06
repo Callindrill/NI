@@ -8,22 +8,23 @@ namespace CryptoLib
     public class Symmetric
     {
         private readonly RijndaelManaged _provider;
-        private readonly byte[] _key;
-        private readonly byte[] _iv;
+
+        public byte[] Key { get; }
+        public byte[] Iv { get; }
 
         public Symmetric(string key = null, string iv = null)
         {
             _provider = new RijndaelManaged();
             if (key != null || iv != null) {
-                _key = Convert.FromBase64String(key);
-                _iv = Convert.FromBase64String(iv);
+                Key = Convert.FromBase64String(key);
+                Iv = Convert.FromBase64String(iv);
             } 
             else {
                 using (var rngProvider = new RNGCryptoServiceProvider()) {
-                    _key = new byte[_provider.KeySize / 8];
-                    rngProvider.GetBytes(_key);
-                    _iv = new byte[_provider.BlockSize / 8];
-                    rngProvider.GetBytes(_iv);
+                    Key = new byte[_provider.KeySize / 8];
+                    rngProvider.GetBytes(Key);
+                    Iv = new byte[_provider.BlockSize / 8];
+                    rngProvider.GetBytes(Iv);
                 }
             }
         }
@@ -34,7 +35,7 @@ namespace CryptoLib
             byte[] cipherBytes;
 
             using (var buf = new MemoryStream()) {
-                using (var stream = new CryptoStream(buf, _provider.CreateEncryptor(_key, _iv), CryptoStreamMode.Write)) {
+                using (var stream = new CryptoStream(buf, _provider.CreateEncryptor(Key, Iv), CryptoStreamMode.Write)) {
                     stream.Write(clearBytes, 0, clearBytes.Length);
                     stream.FlushFinalBlock();
                 }
@@ -49,7 +50,7 @@ namespace CryptoLib
             byte[] clearBytes;
 
             using (var buf = new MemoryStream()) {
-                using (var stream = new CryptoStream(buf, _provider.CreateDecryptor(_key, _iv), CryptoStreamMode.Write)) {
+                using (var stream = new CryptoStream(buf, _provider.CreateDecryptor(Key, Iv), CryptoStreamMode.Write)) {
                     stream.Write(cipherBytes, 0, cipherBytes.Length);
                     stream.FlushFinalBlock();
                 }
